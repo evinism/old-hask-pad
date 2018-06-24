@@ -36,7 +36,8 @@ Executable hask-pad
     time                      >= 1.1     && < 1.9,
     xmlhtml                   >= 0.1     && < 0.3,
     postgresql-simple,
-    snaplet-postgresql-simple
+    snaplet-postgresql-simple,
+    uuid
 
   if flag(old-base)
     build-depends:

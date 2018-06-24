@@ -21,6 +21,7 @@ import           Snap.Util.FileServe
 ------------------------------------------------------------------------------
 import           Application
 import           AuthHandlers
+import           NoteHandlers
 
 ------------------------------------------------------------------------------
 -- | The application's routes.
@@ -28,6 +29,8 @@ routes :: [(ByteString, Handler App App ())]
 routes = [ ("login",    with auth handleLoginSubmit)
          , ("logout",   with auth handleLogout)
          , ("new_user", with auth handleNewUser)
+         , ("new", handleNewNote)
+         , ("note/:noteId", handleNote)
          , ("",         serveDirectory "static")
          ]
 
