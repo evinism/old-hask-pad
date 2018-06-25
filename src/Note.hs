@@ -7,15 +7,19 @@ import qualified Data.Text as T
 import Data.UUID
 import Data.UUID.V4
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
 
 type NoteError = T.Text
 type NoteResult = Either NoteError Note
 type NoteId = T.Text
 
 data Note = Note
-  { nid :: NoteId
-  , content :: T.Text
+  { id :: NoteId
+  , noteContent :: T.Text
   } deriving (Show)
+
+instance FromRow Note where
+  fromRow = Note <$> field <*> field
 
 noteExists :: Connection -> NoteId -> IO Bool
 noteExists = error "todo: noteExists"
