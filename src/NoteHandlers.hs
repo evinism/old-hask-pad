@@ -3,6 +3,7 @@
 module NoteHandlers where
 
 import           Control.Applicative
+import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Map.Syntax ((##))
 import           Data.Monoid ((<>))
@@ -33,6 +34,7 @@ import           Note
 bsToText :: BS.ByteString -> T.Text
 bsToText bs = T.pack $ BS.unpack bs
 
+-- Todo: put these into their own files
 getNote :: NoteId -> Handler App App ()
 getNote noteId = do
   results <- query "select id, content from notes WHERE id=?" $ Only noteId
@@ -42,7 +44,7 @@ getNote noteId = do
 
 handleNote :: Handler App App ()
 handleNote = do
-  potNoteId <- getParam  "noteId"
+  potNoteId <- getParam "noteId"
   case potNoteId of
     Nothing -> writeText "404 - no note of that ID"
     Just noteId -> getNote $ bsToText noteId
@@ -53,3 +55,20 @@ handleNewNote = do
   noteId <- liftIO randomNoteId
   execute "INSERT INTO notes VALUES (?, now(), 'lol');" $ Only noteId
   redirect $ BS.pack ("/note/" ++ (T.unpack noteId))
+
+-- put these into notes, but for now it ain't necessary
+updateNote :: NoteId -> T.Text -> Handler App App()
+updateNote noteId content = do
+  results <- query "UPDATE notes SET content=?, lastuse=now() WHERE id=?;" $ (content, noteId)
+  case results of
+    [] -> writeText "404 - no note of that ID"
+    (note:_) -> writeText $ noteContent note
+
+handleUpdateNote :: Handler App App ()
+handleUpdateNote = do 
+  potNoteId <- getParam  "noteId"
+  potContent <- getParam "content"
+  params <- return $ liftM2 (,) potNoteId potContent
+  case params of
+    Nothing -> writeText "404 - no note of that ID"
+    Just (noteId, content) -> updateNote (bsToText noteId) (bsToText content)
