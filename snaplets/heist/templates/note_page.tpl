@@ -1,4 +1,3 @@
 <apply template="base">
-  NOTE PAGE
-  <noteContent/>
+  <textarea><noteContent /></textarea>
 </apply>
