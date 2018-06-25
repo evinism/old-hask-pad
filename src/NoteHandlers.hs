@@ -34,16 +34,20 @@ import           Note
 bsToText :: BS.ByteString -> T.Text
 bsToText bs = T.pack $ BS.unpack bs
 
+renderNote :: Note -> Handler App App ()
+renderNote note = heistLocal (I.bindSplice "noteContent" spl) $ render "note_page"
+  where spl = I.textSplice $ noteContent note
+
 -- Todo: put these into their own files
 getNote :: NoteId -> Handler App App ()
 getNote noteId = do
   results <- query "select id, content from notes WHERE id=?" $ Only noteId
   case results of
     [] -> writeText "404 - no note of that ID"
-    (note:_) -> writeText $ noteContent note
+    (note:_) -> renderNote note
 
-handleNote :: Handler App App ()
-handleNote = do
+handleGetNote :: Handler App App ()
+handleGetNote = do
   potNoteId <- getParam "noteId"
   case potNoteId of
     Nothing -> writeText "404 - no note of that ID"
@@ -53,7 +57,7 @@ handleNote = do
 handleNewNote :: Handler App App ()
 handleNewNote = do
   noteId <- liftIO randomNoteId
-  execute "INSERT INTO notes VALUES (?, now(), 'lol');" $ Only noteId
+  execute "INSERT INTO notes VALUES (?, now(), '');" $ Only noteId
   redirect $ BS.pack ("/note/" ++ (T.unpack noteId))
 
 -- put these into notes, but for now it ain't necessary

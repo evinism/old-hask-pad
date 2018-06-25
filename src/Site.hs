@@ -26,14 +26,15 @@ import           NoteHandlers
 ------------------------------------------------------------------------------
 -- | The application's routes.
 routes :: [(ByteString, Handler App App ())]
-routes = [ ("login",    with auth handleLoginSubmit)
-         , ("logout",   with auth handleLogout)
-         , ("new_user", with auth handleNewUser)
-         , ("new", handleNewNote)
-         , ("note/:noteId", handleNote)
-         , ("",         serveDirectory "static")
-         ]
-
+routes = 
+  [ ("login", with auth handleLoginSubmit)
+  , ("logout", with auth handleLogout)
+  , ("new_user", with auth handleNewUser)
+  , ("new", handleNewNote)
+  , ("note/:noteId", method GET handleGetNote)
+  , ("note/:noteId", method PATCH handleUpdateNote)
+  , ("", serveDirectory "static")
+  ]
 
 ------------------------------------------------------------------------------
 -- | The application initializer.
